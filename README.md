@@ -1,2 +1,2 @@
-# e-gov-land-registry
-This is a decentralized land registration.
+# DLandRegTestVersion
+This is the test version of land registration system
