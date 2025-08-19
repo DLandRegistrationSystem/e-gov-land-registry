@@ -1,0 +1,9 @@
+/Users/s.shreyeeka/Desktop/e-gov-land-registry/LandRegistry.Web/obj/Debug/net7.0/rpswa.dswa.cache.json
+/Users/s.shreyeeka/Desktop/e-gov-land-registry/LandRegistry.Web/obj/Debug/net7.0/LandRegistry.Web.GeneratedMSBuildEditorConfig.editorconfig
+/Users/s.shreyeeka/Desktop/e-gov-land-registry/LandRegistry.Web/obj/Debug/net7.0/LandRegistry.Web.AssemblyInfoInputs.cache
+/Users/s.shreyeeka/Desktop/e-gov-land-registry/LandRegistry.Web/obj/Debug/net7.0/LandRegistry.Web.AssemblyInfo.cs
+/Users/s.shreyeeka/Desktop/e-gov-land-registry/LandRegistry.Web/obj/Debug/net7.0/LandRegistry.Web.csproj.CoreCompileInputs.cache
+/Users/s.shreyeeka/Desktop/e-gov-land-registry/LandRegistry.Web/obj/Debug/net7.0/LandRegistry.Web.MvcApplicationPartsAssemblyInfo.cache
+/Users/s.shreyeeka/Desktop/e-gov-land-registry/LandRegistry.Web/obj/Debug/net7.0/LandRegistry.Web.RazorAssemblyInfo.cache
+/Users/s.shreyeeka/Desktop/e-gov-land-registry/LandRegistry.Web/obj/Debug/net7.0/LandRegistry.Web.RazorAssemblyInfo.cs
+/Users/s.shreyeeka/Desktop/e-gov-land-registry/LandRegistry.Web/obj/Debug/net7.0/LandRegistry.Web.sourcelink.json

@@ -1,9 +1,11 @@
 # app.py
 
 from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 from chat import get_response
 
 app = Flask(__name__)
+CORS(app)  # This will allow requests from any origin
 
 @app.route("/")
 def home():

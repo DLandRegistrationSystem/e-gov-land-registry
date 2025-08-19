@@ -1,0 +1,163 @@
+﻿@page "/"
+@using LandRegistry.Web.Models
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">🗺️ Land Registry Nepal</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#register">Register Land</a></li>
+                <li class="nav-item"><a class="nav-link" href="#transfer">Transfer Ownership</a></li>
+                <li class="nav-item"><a class="nav-link" href="#history">View History</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contract">Smart Contract</a></li>
+                <li class="nav-item"><a class="nav-link" href="#chatbot">AI Chatbot</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<header class="bg-light text-center p-5">
+    <h1 class="display-5">Welcome to Nepal's Land Registration System</h1>
+    <p class="lead">Blockchain-Powered | Transparent | Secure</p>
+</header>
+
+<!-- Register Land -->
+<section class="container my-5" id="register">
+    <h2>📌 Land Registration</h2>
+    <EditForm Model="@newLand" OnValidSubmit="@RegisterLand">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="mb-3">
+            <label for="ownerName" class="form-label">Owner Name</label>
+            <InputText class="form-control" id="ownerName" @bind-Value="newLand.OwnerName" />
+        </div>
+        <div class="mb-3">
+            <label for="landLocation" class="form-label">Land Location</label>
+            <InputText class="form-control" id="landLocation" @bind-Value="newLand.Location" />
+        </div>
+        <div class="mb-3">
+            <label for="area" class="form-label">Area (in Ropani)</label>
+            <InputNumber class="form-control" id="area" @bind-Value="newLand.Area" />
+        </div>
+        <button type="submit" class="btn btn-success">Register Land</button>
+    </EditForm>
+</section>
+
+<!-- Transfer Ownership -->
+<section class="container my-5" id="transfer">
+    <h2>🔁 Transfer Ownership</h2>
+    <EditForm Model="@transferModel" OnValidSubmit="@TransferOwnership">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="mb-3">
+            <label for="landId" class="form-label">Land ID</label>
+            <InputText class="form-control" id="landId" @bind-Value="transferModel.LandId" />
+        </div>
+        <div class="mb-3">
+            <label for="newOwner" class="form-label">New Owner Name</label>
+            <InputText class="form-control" id="newOwner" @bind-Value="transferModel.NewOwnerName" />
+        </div>
+        <button type="submit" class="btn btn-warning">Transfer</button>
+    </EditForm>
+</section>
+
+<!-- Land History Viewer -->
+<section class="container my-5" id="history">
+    <h2>📜 Land History Viewer</h2>
+    <EditForm Model="@historyModel" OnValidSubmit="@FetchHistory">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="mb-3">
+            <label for="historyLandId" class="form-label">Enter Land ID</label>
+            <InputText class="form-control" id="historyLandId" @bind-Value="historyModel.LandId" />
+        </div>
+        <button type="submit" class="btn btn-info">Fetch History</button>
+    </EditForm>
+    <div class="mt-3" id="historyResults">
+        @if (historyResults != null)
+        {
+            <ul>
+                @foreach (var record in historyResults)
+                {
+                    <li>@record.OwnerName owned land at @record.Location (Area: @record.Area)</li>
+                }
+            </ul>
+        }
+    </div>
+</section>
+
+<!-- Smart Contract Interaction -->
+<section class="container my-5" id="contract">
+    <h2>💡 Smart Contract Interaction</h2>
+    <button class="btn btn-outline-dark" @onclick="MintLandToken">🔗 Mint Land Token</button>
+    <button class="btn btn-outline-secondary" @onclick="VerifyOwnership">🚀 Verify Ownership</button>
+    <button class="btn btn-outline-success" @onclick="SubmitToBlockchain">📤 Submit to Blockchain</button>
+</section>
+
+<!-- AI Chatbot -->
+<section class="container my-5" id="chatbot">
+    <h2>🤖 AI Chatbot Assistant</h2>
+    <p>Need help? Use the chatbot below to ask any question about the system.</p>
+    <div class="chatbot-box">
+        <iframe src="https://example-chatbot.com/embed" title="AI Bot"></iframe>
+    </div>
+</section>
+
+<footer class="text-center p-4 bg-light mt-5">
+    <small>© 2025 Government of Nepal – Land Registration Blockchain System</small>
+</footer>
+
+@code {
+    LandRecord newLand = new LandRecord();
+
+    TransferModel transferModel = new TransferModel();
+    HistoryModel historyModel = new HistoryModel();
+    List<LandRecord>? historyResults;
+
+    private async Task RegisterLand()
+    {
+        // Call your API to register land
+        // await Api.AddRecord(newLand);
+    }
+
+    private async Task TransferOwnership()
+    {
+        // Call your API to transfer ownership
+        // await Api.TransferOwnership(transferModel.LandId, transferModel.NewOwnerName);
+    }
+
+    private async Task FetchHistory()
+    {
+        // Call your API to fetch history
+        // historyResults = await Api.GetHistory(historyModel.LandId);
+    }
+
+    private void MintLandToken()
+    {
+        // Implement smart contract mint logic
+    }
+
+    private void VerifyOwnership()
+    {
+        // Implement smart contract verify logic
+    }
+
+    private void SubmitToBlockchain()
+    {
+        // Implement smart contract submit logic
+    }
+
+    public class TransferModel
+    {
+        public string LandId { get; set; } = string.Empty;
+        public string NewOwnerName { get; set; } = string.Empty;
+    }
+
+    public class HistoryModel
+    {
+        public string LandId { get; set; } = string.Empty;
+    }
+}
