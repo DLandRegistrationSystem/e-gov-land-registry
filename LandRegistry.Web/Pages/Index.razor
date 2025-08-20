@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using LandRegistry.Web.Models
+@using Microsoft.AspNetCore.Components.Forms
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
     <div class="container-fluid">
@@ -31,8 +32,16 @@
         <DataAnnotationsValidator />
         <ValidationSummary />
         <div class="mb-3">
+            <label for="landIdReg" class="form-label">Land ID</label>
+            <InputText class="form-control" id="landIdReg" @bind-Value="registerLandId" />
+        </div>
+        <div class="mb-3">
             <label for="ownerName" class="form-label">Owner Name</label>
             <InputText class="form-control" id="ownerName" @bind-Value="newLand.OwnerName" />
+        </div>
+        <div class="mb-3">
+            <label for="ownerAddr" class="form-label">Owner Address (Sui)</label>
+            <InputText class="form-control" id="ownerAddr" @bind-Value="registerOwnerAddress" />
         </div>
         <div class="mb-3">
             <label for="landLocation" class="form-label">Land Location</label>
@@ -43,6 +52,18 @@
             <InputNumber class="form-control" id="area" @bind-Value="newLand.Area" />
         </div>
         <button type="submit" class="btn btn-success">Register Land</button>
+        @if (!string.IsNullOrWhiteSpace(registerTxDigest))
+        {
+            <div class="alert alert-success mt-3">Transaction: @registerTxDigest</div>
+        }
+        @if (!string.IsNullOrWhiteSpace(registerError))
+        {
+            <div class="alert alert-danger mt-3">@registerError</div>
+        }
+        @if (!string.IsNullOrWhiteSpace(registerRawOutput))
+        {
+            <pre class="mt-3" style="white-space:pre-wrap">@registerRawOutput</pre>
+        }
     </EditForm>
 </section>
 
@@ -110,44 +131,118 @@
     <small>© 2025 Government of Nepal – Land Registration Blockchain System</small>
 </footer>
 
-@code {
-    LandRecord newLand = new LandRecord();
+<script src="js/land.js"></script>
 
+@code {
+    [Inject] private IJSRuntime? JS { get; set; }
+    [Inject] private IHttpClientFactory? ClientFactory { get; set; }
+
+    LandRecord newLand = new LandRecord();
+    string registerLandId = string.Empty;
+    string registerOwnerAddress = string.Empty;
+    string? registerTxDigest;
+    string? registerError;
+    string? registerRawOutput;
     TransferModel transferModel = new TransferModel();
     HistoryModel historyModel = new HistoryModel();
     List<LandRecord>? historyResults;
 
+    // Sui smart contract parameters (replace with actual values after deployment)
+    private string PackageId = "0x69373aab510d125280e775c4c99a826bf6b7be29a98747a9e8c95ebc5fbf4ad2";
+    private string Module = "land_registry";
+    private string AdminCapId = "0x3ab049e510886e46608305a605de10f6c541d60b5194e4c43494947e50cc0630";
+
+    private HttpClient Http => ClientFactory != null
+        ? ClientFactory.CreateClient("ApiClient")
+        : throw new InvalidOperationException("ClientFactory is not initialized.");
+
+    // Now you can use relative URLs like "api/land/register"
     private async Task RegisterLand()
     {
-        // Call your API to register land
-        // await Api.AddRecord(newLand);
+        registerTxDigest = null;
+        registerError = null;
+        registerRawOutput = null;
+
+        // Build the DTO the API expects
+        var payload = new
+        {
+            LandId = registerLandId,
+            OwnerAddress = registerOwnerAddress,
+            Location = newLand.Location,
+            AreaRopani = (ulong)Math.Max(0, Math.Round(newLand.Area))
+        };
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/land/register", payload);
+            var body = await response.Content.ReadFromJsonAsync<ResponseDto>();
+
+            if (response.IsSuccessStatusCode && body?.TransactionHash is string digest && !string.IsNullOrWhiteSpace(digest))
+            {
+                registerTxDigest = digest;
+                registerRawOutput = body?.Output;
+            }
+            else
+            {
+                registerError = body?.Error ?? $"Registration failed (HTTP {(int)response.StatusCode}).";
+                registerRawOutput = body?.Output;
+            }
+        }
+        catch (Exception ex)
+        {
+            registerError = ex.Message;
+        }
     }
 
-    private async Task TransferOwnership()
+    private Task TransferOwnership()
     {
-        // Call your API to transfer ownership
+        // Example: save off-chain via API
         // await Api.TransferOwnership(transferModel.LandId, transferModel.NewOwnerName);
+        return Task.CompletedTask;
     }
 
-    private async Task FetchHistory()
+    private Task FetchHistory()
     {
-        // Call your API to fetch history
+        // Example: fetch off-chain history
         // historyResults = await Api.GetHistory(historyModel.LandId);
+        return Task.CompletedTask;
     }
 
-    private void MintLandToken()
+    // === Blockchain functions via JSInterop ===
+    private async Task MintLandToken()
     {
-        // Implement smart contract mint logic
+        if (JS is not null)
+        {
+            await JS.InvokeVoidAsync("mintLandToken", PackageId, Module, AdminCapId);
+        }
+        else
+        {
+            Console.WriteLine("JSRuntime is not initialized.");
+        }
     }
 
-    private void VerifyOwnership()
+    private async Task SubmitToBlockchain()
     {
-        // Implement smart contract verify logic
+        if (JS is not null)
+        {
+            await JS.InvokeVoidAsync("submitToBlockchain", PackageId, Module);
+        }
+        else
+        {
+            Console.WriteLine("JSRuntime is not initialized.");
+        }
     }
 
-    private void SubmitToBlockchain()
+    private async Task VerifyOwnership()
     {
-        // Implement smart contract submit logic
+        if (JS is not null)
+        {
+            await JS.InvokeVoidAsync("verifyOwnership", PackageId, Module);
+        }
+        else
+        {
+            Console.WriteLine("JSRuntime is not initialized.");
+        }
     }
 
     public class TransferModel
@@ -159,5 +254,12 @@
     public class HistoryModel
     {
         public string LandId { get; set; } = string.Empty;
+    }
+
+    public class ResponseDto
+    {
+        public string? TransactionHash { get; set; }
+        public string? Output { get; set; }
+        public string? Error { get; set; }
     }
 }

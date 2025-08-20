@@ -8,9 +8,11 @@ builder.Services.AddServerSideBlazor();
 
 // Register HttpClient + LandApiClient
 builder.Services.AddScoped<LandApiClient>();
-builder.Services.AddHttpClient<LandApiClient>(client =>
+builder.Services.AddHttpClient("ApiClient", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:5001/"); // Use your API base URL
+    // Point to the API service, not the web app itself.
+    // API launchSettings exposes http://localhost:5034 and https://localhost:7179
+    client.BaseAddress = new Uri("http://localhost:5034/");
 });
 
 var app = builder.Build();
@@ -22,7 +24,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+if (app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 app.UseStaticFiles();
 
 app.UseRouting();
